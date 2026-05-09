@@ -1,0 +1,9 @@
+.git
+.github
+.trae
+**/node_modules
+**/dist
+**/.DS_Store
+**/Thumbs.db
+backend/mashiro.db
+DESIGN.assets

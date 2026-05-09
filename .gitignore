@@ -1,0 +1,40 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local tooling
+.trae/
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Go build outputs / temp
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.out
+
+# Logs
+*.log
+
+# Local env
+.env
+.env.local
+.env.*.local
+
+# Database / runtime data
+backend/mashiro.db
+*.db
+*.db-shm
+*.db-wal
+
+# Archives
+*.zip

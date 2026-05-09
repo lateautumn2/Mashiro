@@ -1,0 +1,30 @@
+services:
+  backend:
+    image: ${MASHIRO_BACKEND_IMAGE}:${MASHIRO_VERSION}
+    restart: unless-stopped
+    environment:
+      MASHIRO_PORT: 8080
+      MASHIRO_DB_PATH: /data/mashiro.db
+      MASHIRO_JWT_SECRET: ${MASHIRO_JWT_SECRET}
+      MASHIRO_ADMIN_USERNAME: ${MASHIRO_ADMIN_USERNAME:-admin}
+      MASHIRO_ADMIN_PASSWORD: ${MASHIRO_ADMIN_PASSWORD}
+    volumes:
+      - mashiro-data:/data
+    networks:
+      - mashiro
+
+  frontend:
+    image: ${MASHIRO_FRONTEND_IMAGE}:${MASHIRO_VERSION}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${MASHIRO_HTTP_PORT:-80}:80"
+    networks:
+      - mashiro
+
+volumes:
+  mashiro-data:
+
+networks:
+  mashiro:
