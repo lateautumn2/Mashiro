@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -26,14 +25,16 @@ type DeployCommandSet struct {
 
 func buildDeployCommands(c *gin.Context, server models.Server) DeployCommandSet {
 	baseURL := getRequestBaseURL(c)
-	scriptToken := url.QueryEscape(server.AuthToken)
-	linuxScriptURL := fmt.Sprintf("%s/api/agent/install.sh?token=%s", baseURL, scriptToken)
-	windowsScriptURL := fmt.Sprintf("%s/api/agent/install.ps1?token=%s", baseURL, scriptToken)
+	token := server.AuthToken
+	baseURL = strings.TrimRight(baseURL, "/")
+
+	linuxCurl := fmt.Sprintf(`bash <(curl -fsSL "https://raw.githubusercontent.com/lateautumn2/Mashiro/main/install.sh") -e "%s" -t "%s"`, baseURL, token)
+	windowsPS := fmt.Sprintf(`powershell -ExecutionPolicy Bypass -NoProfile -Command "$env:MASHIRO_BASE_URL='%s'; $env:MASHIRO_AGENT_TOKEN='%s'; iex (irm 'https://raw.githubusercontent.com/lateautumn2/Mashiro/main/install.ps1')"`, baseURL, token)
 
 	return DeployCommandSet{
-		Linux:   fmt.Sprintf("bash <(curl -fsSL \"%s\")", linuxScriptURL),
-		Windows: fmt.Sprintf("powershell -ExecutionPolicy Bypass -Command \"irm '%s' | iex\"", windowsScriptURL),
-		MacOS:   fmt.Sprintf("bash <(curl -fsSL \"%s\")", linuxScriptURL),
+		Linux:   linuxCurl,
+		Windows: windowsPS,
+		MacOS:   linuxCurl,
 	}
 }
 
