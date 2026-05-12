@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"backend/models"
+	"backend/notifier"
 )
 
 const defaultTrafficResetDay = 1
@@ -31,6 +32,7 @@ func syncTrafficResetState(server *models.Server, currentNetIn, currentNetOut ui
 		server.TrafficResetAt = windowStart
 		server.TrafficResetNetInBase = currentNetIn
 		server.TrafficResetNetOutBase = currentNetOut
+		notifier.ResetTrafficWarning(server.ID)
 		return true
 	}
 
@@ -38,6 +40,7 @@ func syncTrafficResetState(server *models.Server, currentNetIn, currentNetOut ui
 		server.TrafficResetAt = now.UTC()
 		server.TrafficResetNetInBase = currentNetIn
 		server.TrafficResetNetOutBase = currentNetOut
+		notifier.ResetTrafficWarning(server.ID)
 		return true
 	}
 

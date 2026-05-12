@@ -1,3 +1,5 @@
+import { clearAuthAndRedirect } from './auth';
+
 const DEFAULT_API_BASE_URL = '/api';
 
 function normalizeBaseUrl(url: string) {
@@ -65,6 +67,11 @@ export async function apiRequest<T>(
     : await response.text();
 
   if (!response.ok) {
+    if (response.status === 401 && options.auth) {
+      clearAuthAndRedirect();
+      throw new ApiError('登录已过期，请重新登录', 401);
+    }
+
     const message =
       typeof payload === 'object' && payload && 'error' in payload
         ? String(payload.error)

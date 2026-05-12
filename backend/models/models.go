@@ -83,3 +83,13 @@ type AppConfig struct {
 	Key   string `gorm:"uniqueIndex" json:"key"`
 	Value string `json:"value"`
 }
+
+type NotificationPref struct {
+	ServerID             uint      `gorm:"primaryKey" json:"server_id"`
+	NotifyOnline         bool      `gorm:"default:true" json:"notify_online"`
+	NotifyOffline        bool      `gorm:"default:true" json:"notify_offline"`
+	NotifyTraffic        bool      `gorm:"default:true" json:"notify_traffic"`
+	NotifyExpiry         bool      `gorm:"default:true" json:"notify_expiry"`
+	TrafficWarningSent   bool      `gorm:"default:false" json:"-"`
+	LastExpiryNotifiedAt time.Time `json:"-"`
+}

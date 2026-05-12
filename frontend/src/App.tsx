@@ -6,6 +6,7 @@ import Dashboard from './pages/dashboard';
 import AdminServers from './pages/admin/servers';
 import AdminLatency from './pages/admin/latency';
 import AdminSettings from './pages/admin/settings';
+import AdminNotifications from './pages/admin/notifications';
 import AdminLogin from './pages/admin/login';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
             <Route index element={<AdminServers />} />
             <Route path="latency" element={<AdminLatency />} />
             <Route path="settings" element={<AdminSettings />} />
+            <Route path="notifications" element={<AdminNotifications />} />
           </Route>
         </Route>
       </Routes>

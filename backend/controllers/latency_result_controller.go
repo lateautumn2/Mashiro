@@ -25,10 +25,9 @@ type AgentLatencyReportInput struct {
 }
 
 func AgentReportLatencyResults(c *gin.Context) {
-	token := c.GetString("agent_token")
-	var server models.Server
-	if err := db.DB.Where("auth_token = ?", token).First(&server).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid server token"})
+	serverID := c.GetUint("agent_server_id")
+	if serverID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid server identity"})
 		return
 	}
 
@@ -46,7 +45,7 @@ func AgentReportLatencyResults(c *gin.Context) {
 
 		record := models.LatencyResult{
 			TaskID:       item.TaskID,
-			ServerID:     server.ID,
+			ServerID:     serverID,
 			TaskName:     item.TaskName,
 			Type:         item.Type,
 			Target:       item.Target,
@@ -56,7 +55,7 @@ func AgentReportLatencyResults(c *gin.Context) {
 			CheckedAt:    now,
 		}
 
-		if err := db.DB.Where("task_id = ? AND server_id = ?", item.TaskID, server.ID).Assign(record).FirstOrCreate(&models.LatencyResult{}).Error; err != nil {
+		if err := db.DB.Where("task_id = ? AND server_id = ?", item.TaskID, serverID).Assign(record).FirstOrCreate(&models.LatencyResult{}).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save latency result"})
 			return
 		}

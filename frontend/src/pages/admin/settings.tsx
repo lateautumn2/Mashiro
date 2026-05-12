@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Save, Bell, Shield } from 'lucide-react';
-import { ApiError, apiRequest } from '../../lib/api';
-import { clearAuth, getUsername } from '../../lib/auth';
+import { apiRequest } from '../../lib/api';
+import { getUsername } from '../../lib/auth';
 
 export default function AdminSettings() {
   const [tgBotToken, setTgBotToken] = useState('');
@@ -21,9 +21,6 @@ export default function AdminSettings() {
       } catch (err) {
         const message = err instanceof Error ? err.message : '加载配置失败';
         setError(message);
-        if (err instanceof ApiError && err.status === 401) {
-          clearAuth();
-        }
       }
     };
     void fetchConfigs();
@@ -46,9 +43,6 @@ export default function AdminSettings() {
     } catch (err) {
       const message = err instanceof Error ? err.message : '保存设置失败';
       setError(message);
-      if (err instanceof ApiError && err.status === 401) {
-        clearAuth();
-      }
     }
   };
 
@@ -69,9 +63,6 @@ export default function AdminSettings() {
     } catch (err) {
       const message = err instanceof Error ? err.message : '更新密码失败';
       setError(message);
-      if (err instanceof ApiError && err.status === 401) {
-        clearAuth();
-      }
     }
   };
 

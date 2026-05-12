@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strings"
@@ -10,7 +12,6 @@ import (
 	"backend/models"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type AddServerInput struct {
@@ -98,17 +99,11 @@ func AdminAddServer(c *gin.Context) {
 		return
 	}
 
-	tokenSeed := name + time.Now().UTC().Format(time.RFC3339Nano)
-	if ip != "" {
-		tokenSeed += ip
-	}
-
-	hash, err := bcrypt.GenerateFromPassword([]byte(tokenSeed), bcrypt.DefaultCost)
+	authToken, err := generateAuthToken()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate server token"})
 		return
 	}
-	authToken := fmt.Sprintf("%x", hash)[:32]
 
 	expiryTime, err := parseExpiryTime(input.ExpiryTime)
 	if err != nil {
@@ -227,4 +222,13 @@ func AdminGetDeployCommand(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, buildDeployCommands(c, server))
+}
+
+// generateAuthToken creates a cryptographically random 64-character hex token (256 bits).
+func generateAuthToken() (string, error) {
+	buf := make([]byte, 32)
+	if _, err := rand.Read(buf); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(buf), nil
 }

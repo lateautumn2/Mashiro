@@ -28,6 +28,7 @@ func InitDB() {
 		&models.LatencyTaskServer{},
 		&models.LatencyResult{},
 		&models.AppConfig{},
+		&models.NotificationPref{},
 	)
 	if err != nil {
 		log.Fatal("Failed to auto migrate database:", err)

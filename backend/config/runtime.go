@@ -4,7 +4,15 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
+
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: .env file not found, using system env vars")
+	}
+}
 
 const (
 	defaultPort          = "8080"

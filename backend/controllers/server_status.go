@@ -5,6 +5,7 @@ import (
 
 	"backend/db"
 	"backend/models"
+	"backend/notifier"
 )
 
 const serverOfflineTimeout = 20 * time.Second
@@ -28,6 +29,11 @@ func syncServerStatus(server *models.Server, latest models.AgentData, hasLatest 
 		return
 	}
 
+	previousStatus := server.Status
 	server.Status = desiredStatus
 	db.DB.Model(server).Update("status", desiredStatus)
+
+	if previousStatus == "online" && desiredStatus == "offline" {
+		notifier.NotifyOffline(*server)
+	}
 }

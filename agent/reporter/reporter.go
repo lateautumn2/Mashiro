@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"agent/collector"
+	"agent/signer"
 )
 
 type ReportPayload struct {
@@ -83,8 +84,12 @@ func (r *Reporter) Report() error {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	// 默认情况下发送 agentID 作为 Token 供后端认证
 	req.Header.Set("X-Agent-Token", r.AgentID)
+
+	// Sign the request with HMAC to prevent tampering and replay.
+	sig, ts := signer.SignRequest("POST", req.URL.Path, data, r.AgentID)
+	req.Header.Set("X-Signature", sig)
+	req.Header.Set("X-Timestamp", ts)
 
 	resp, err := r.Client.Do(req)
 	if err != nil {

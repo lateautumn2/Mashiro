@@ -153,17 +153,16 @@ func AdminDeleteLatencyTask(c *gin.Context) {
 }
 
 func AgentGetLatencyTasks(c *gin.Context) {
-	token := c.GetString("agent_token")
-	var server models.Server
-	if err := db.DB.Where("auth_token = ?", token).First(&server).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid server token"})
+	serverID := c.GetUint("agent_server_id")
+	if serverID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid server identity"})
 		return
 	}
 
 	var tasks []models.LatencyTask
 	db.DB.
 		Joins("JOIN latency_task_servers ON latency_task_servers.task_id = latency_tasks.id").
-		Where("latency_task_servers.server_id = ? AND latency_tasks.enabled = ?", server.ID, true).
+		Where("latency_task_servers.server_id = ? AND latency_tasks.enabled = ?", serverID, true).
 		Order("latency_tasks.id desc").
 		Find(&tasks)
 

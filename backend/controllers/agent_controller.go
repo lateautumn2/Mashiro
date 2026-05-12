@@ -6,6 +6,7 @@ import (
 
 	"backend/db"
 	"backend/models"
+	"backend/notifier"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,11 +33,9 @@ type AgentReportInput struct {
 }
 
 func ReportAgentData(c *gin.Context) {
-	token := c.GetString("agent_token")
-
-	var server models.Server
-	if err := db.DB.Where("auth_token = ?", token).First(&server).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid server token"})
+	serverID := c.GetUint("agent_server_id")
+	if serverID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid server identity"})
 		return
 	}
 
@@ -45,6 +44,15 @@ func ReportAgentData(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	var server models.Server
+	if err := db.DB.First(&server, serverID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server not found"})
+		return
+	}
+
+	// Detect online event for notification (before overwriting status).
+	wasOffline := server.Status == "offline"
 
 	// Update server metadata from latest agent report.
 	server.Status = "online"
@@ -66,6 +74,10 @@ func ReportAgentData(c *gin.Context) {
 	}
 	syncTrafficResetState(&server, input.NetIn, input.NetOut, time.Now())
 	db.DB.Save(&server)
+
+	if wasOffline {
+		notifier.NotifyOnline(server)
+	}
 
 	// Save agent data
 	agentData := models.AgentData{

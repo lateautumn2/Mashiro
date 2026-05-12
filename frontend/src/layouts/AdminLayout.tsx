@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Server, Settings, LogOut, Activity, Wifi } from 'lucide-react';
+import { LayoutDashboard, Server, Settings, LogOut, Activity, Wifi, Bell } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { clearAuth, getUsername } from '../lib/auth';
 
@@ -10,6 +10,7 @@ export function AdminLayout() {
   const navigation = [
     { name: 'Servers', href: '/admin', icon: Server },
     { name: 'Latency', href: '/admin/latency', icon: Wifi },
+    { name: 'Notifications', href: '/admin/notifications', icon: Bell },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 

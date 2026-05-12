@@ -24,10 +24,10 @@ func SetupRouter() *gin.Engine {
 		{
 			agent.GET("/install.sh", controllers.AgentInstallShell)
 			agent.GET("/install.ps1", controllers.AgentInstallPowerShell)
-			agent.GET("/package.zip", controllers.AgentPackageArchive)
 		}
 		agent.Use(middleware.AgentAuthRequired())
 		{
+			agent.GET("/package.zip", controllers.AgentPackageArchive)
 			agent.POST("/report", controllers.ReportAgentData)
 			agent.GET("/latency/tasks", controllers.AgentGetLatencyTasks)
 			agent.POST("/latency/results", controllers.AgentReportLatencyResults)
@@ -58,6 +58,10 @@ func SetupRouter() *gin.Engine {
 			// Config (TG Bot, Latency)
 			admin.GET("/config", controllers.GetConfig)
 			admin.POST("/config", controllers.UpdateConfig)
+
+			// Notification Preferences
+			admin.GET("/notification-prefs", controllers.GetNotificationPrefs)
+			admin.PUT("/notification-prefs/:server_id", controllers.UpdateNotificationPref)
 
 			// Auth
 			admin.POST("/password", controllers.ChangePassword)

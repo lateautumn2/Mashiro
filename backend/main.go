@@ -5,11 +5,14 @@ import (
 
 	"backend/config"
 	"backend/db"
+	"backend/notifier"
 	"backend/routes"
 )
 
 func main() {
 	db.InitDB()
+
+	notifier.StartChecker()
 
 	r := routes.SetupRouter()
 	port := config.ServerPort()

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"agent/collector"
+	"agent/signer"
 )
 
 type LatencyTask struct {
@@ -35,6 +36,9 @@ func (r *Reporter) FetchLatencyTasks() ([]LatencyTask, error) {
 		return nil, fmt.Errorf("failed to create latency task request: %w", err)
 	}
 	req.Header.Set("X-Agent-Token", r.AgentID)
+	sig, ts := signer.SignRequest("GET", req.URL.Path, nil, r.AgentID)
+	req.Header.Set("X-Signature", sig)
+	req.Header.Set("X-Timestamp", ts)
 
 	resp, err := r.Client.Do(req)
 	if err != nil {
@@ -66,6 +70,9 @@ func (r *Reporter) ReportLatencyResults(results []LatencyTaskResult) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Agent-Token", r.AgentID)
+	sig, ts := signer.SignRequest("POST", req.URL.Path, data, r.AgentID)
+	req.Header.Set("X-Signature", sig)
+	req.Header.Set("X-Timestamp", ts)
 
 	resp, err := r.Client.Do(req)
 	if err != nil {
